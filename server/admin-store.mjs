@@ -10,7 +10,7 @@ const MAX_AGE = 60 * 60 * 24 * 7; // 7 hari
 export const env = () => ({
   user: process.env.ADMIN_USERNAME || '',
   pass: process.env.ADMIN_PASSWORD || '',
-  blob: process.env.BLOB_READ_WRITE_TOKEN || ''
+  blob: process.env.BLOB_READ_WRITE_TOKEN || process.env.BLOB_STORE_ID || ''
 });
 // Akun admin: dari Environment Variables (jika diisi) atau dibuat sekali lewat /admin (disimpan ter-hash di Blob).
 let credCache = null, credAt = 0;
