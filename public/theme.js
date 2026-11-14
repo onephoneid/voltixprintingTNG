@@ -3,11 +3,11 @@
   const WA='https://wa.me/6283893793285';
   const esc=v=>String(v==null?'':v).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   const safeUrl=u=>{u=String(u||'').trim();if(!u)return '';if(/^(https?:\/\/|#|\?pesan=1$)/i.test(u))return u;return '';};
-  const safeImg=u=>/^uploads\/[\w.\-]+\.(webp|jpe?g|png)$/i.test(String(u||''))?u:'';
+  const safeImg=u=>{u=String(u||'');return /^https:\/\/[a-z0-9-]+\.public\.blob\.vercel-storage\.com\/uploads\/[\w.\-]+$/i.test(u)||/^\/api\/media\?p=uploads%2F[\w.\-]+$/i.test(u)||/^uploads\/[\w.\-]+\.(webp|jpe?g|png)$/i.test(u)?u:'';};
 
   /* Konten dari dashboard admin (content.json) */
   let content=null;
-  try{const r=await fetch('content.json?t='+Date.now(),{cache:'no-store'});if(r.ok)content=await r.json();}catch(e){}
+  for(const src of ['/api/content','content.json?t='+Date.now()]){try{const r=await fetch(src,{cache:'no-store'});if(r.ok&&/json/.test(r.headers.get('content-type')||'')){content=await r.json();break;}}catch(e){}}
   if(content){
     const track=document.querySelector('#vx-carousel .vx-slides');
     const banners=(content.banners||[]).filter(b=>b&&b.active!==false&&safeImg(b.image));

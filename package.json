@@ -8,5 +8,8 @@
   },
   "scripts": {
     "test": "node scripts/verify.mjs"
+  },
+  "dependencies": {
+    "@vercel/blob": "^2.9.0"
   }
 }

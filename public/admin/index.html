@@ -80,22 +80,15 @@ input:focus,select:focus{outline:none;border-color:var(--navy);box-shadow:0 0 0 
 <header class="top"><div class="in"><img src="../assets/voltix-logo.png" alt=""><h1>Dashboard Voltix Printing<small>Kelola banner promo &amp; foto produk</small></h1><a href="/" target="_blank" rel="noopener">Lihat situs ↗</a></div></header>
 <main>
 
-<section class="card" id="login">
- <h2>Masuk</h2>
- <p class="sub">Dashboard menyimpan perubahan langsung ke repositori GitHub situs ini, lalu Vercel memperbarui situs otomatis (±1 menit).</p>
- <label>Token GitHub<input type="password" id="token" autocomplete="off" placeholder="github_pat_..."></label>
- <label class="switch"><input type="checkbox" id="remember" checked> Ingat token di browser ini</label>
- <div class="row" style="margin-top:14px"><button class="btn y" id="btn-login">Masuk</button><span id="login-msg"></span></div>
- <div class="help" style="margin-top:18px"><b>Belum punya token? Buat sekali saja:</b>
-  <ol>
-   <li>Buka <a href="https://github.com/settings/personal-access-tokens/new" target="_blank" rel="noopener">github.com/settings/personal-access-tokens/new</a> (login sebagai <b>onephoneid</b>).</li>
-   <li>Nama: <i>Dashboard Voltix</i>. Expiration: pilih sesuai keinginan (mis. 1 tahun).</li>
-   <li>Repository access: <b>Only select repositories</b> → pilih <b>voltixprintingTNG</b>.</li>
-   <li>Permissions → Repository permissions → <b>Contents: Read and write</b>.</li>
-   <li>Klik <b>Generate token</b>, salin, lalu tempel di atas.</li>
-  </ol>
-  Jangan bagikan token ini ke siapa pun. Token hanya disimpan di browser kamu.
- </div>
+<section class="card" id="login" style="max-width:460px;margin:40px auto">
+ <h2>Masuk Admin</h2>
+ <p class="sub">Kelola banner promo dan foto produk Voltix Printing.</p>
+ <form id="login-form">
+ <label>Username<input type="text" id="username" autocomplete="username" required></label>
+ <label>Password<input type="password" id="password" autocomplete="current-password" required></label>
+ <div class="row" style="margin-top:14px"><button class="btn y" id="btn-login" type="submit">Masuk</button><span id="login-msg"></span></div>
+ </form>
+ <div class="help hidden" id="setup-help" style="margin-top:18px"></div>
 </section>
 
 <div id="app" class="hidden">
@@ -123,32 +116,31 @@ input:focus,select:focus{outline:none;border-color:var(--navy);box-shadow:0 0 0 
 
 <script>
 'use strict';
-const REPO='onephoneid/voltixprintingTNG',BRANCH='main',CONTENT='public/content.json';
 const PRODUCTS=['Banner Ulang Tahun','Banner Usaha','Banner Wisuda','Banner Acara','Stiker','Gantungan Kunci','Baju Custom','Kartu Undangan','Poster Custom','Neon Box','Google Review Card'];
 const LINKS=[['?pesan=1','Buka formulir pesanan'],['#harga','Ke Daftar Harga'],['#cetak-favorit','Ke Cetak Favorit'],['https://shopee.co.id/voltixgraphic','Toko Shopee'],['','Tanpa link'],['custom','Link lain…']];
 const $=s=>document.querySelector(s);
-let token='',data=null,pending={},previews={},dirty=false,dropTarget='banner';
+let data=null,pending={},previews={},dirty=false,dropTarget='banner';
 
 const esc=v=>String(v==null?'':v).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 function status(msg,cls=''){const s=$('#status');s.textContent=msg;s.className=cls;}
 function markDirty(){dirty=true;$('#btn-save').disabled=false;status('Ada perubahan yang belum disimpan.');}
-async function api(path,opt={}){
- const r=await fetch('https://api.github.com/repos/'+REPO+path,{...opt,headers:{Authorization:'Bearer '+token,Accept:'application/vnd.github+json','X-GitHub-Api-Version':'2022-11-28',...(opt.body?{'Content-Type':'application/json'}:{})}});
- if(!r.ok){let m='';try{m=(await r.json()).message}catch(e){}throw new Error(r.status===401?'Token tidak valid atau kedaluwarsa.':r.status===403||r.status===404?'Token tidak punya izin "Contents: Read and write" untuk repo voltixprintingTNG.':('GitHub '+r.status+': '+m));}
- return r.status===204?null:r.json();
+async function api(action,extra={}){
+ const r=await fetch('/api/admin',{method:'POST',headers:{'Content-Type':'application/json'},credentials:'same-origin',body:JSON.stringify({action,...extra})});
+ let j={};try{j=await r.json();}catch(e){}
+ if(r.status===401&&action!=='login'){showLogin('Sesi berakhir. Silakan masuk lagi.');}
+ if(!r.ok)throw new Error(j.error||('Server '+r.status));
+ return j;
 }
-const b64ToText=b=>new TextDecoder().decode(Uint8Array.from(atob(b.replace(/\n/g,'')),c=>c.charCodeAt(0)));
 
 async function load(){
  status('Memuat data…');
- const f=await api('/contents/'+CONTENT+'?ref='+BRANCH);
- data=JSON.parse(b64ToText(f.content));
+ const j=await api('load');data=j.content;
  data.banners=data.banners||[];data.products=data.products||[];
  if(typeof data.showDefaultBanners!=='boolean')data.showDefaultBanners=true;
  pending={};dirty=false;$('#btn-save').disabled=true;render();status('Data dimuat. '+data.banners.length+' banner, '+data.products.length+' produk.');
 }
 
-function imgSrc(p){return pending[p]?pending[p].url:previews[p]||'/'+p;}
+function imgSrc(p){return pending[p]?pending[p].url:previews[p]||(/^uploads\//.test(p)?'/'+p:p);}
 function render(){
  $('#show-default').checked=data.showDefaultBanners;
  const bl=$('#banner-list');
@@ -212,7 +204,7 @@ async function processImage(file,maxW,maxH){
  let ext='webp';
  if(!blob||blob.type!=='image/webp'){blob=await new Promise(r=>c.toBlob(r,'image/jpeg',.86));ext='jpg';}
  const buf=new Uint8Array(await blob.arrayBuffer());let bin='';for(let i=0;i<buf.length;i+=0x8000)bin+=String.fromCharCode.apply(null,buf.subarray(i,i+0x8000));
- return {b64:btoa(bin),url:URL.createObjectURL(blob),ext,w:c.width,h:c.height,size:blob.size};
+ return {b64:btoa(bin),url:URL.createObjectURL(blob),ext,type:blob.type,w:c.width,h:c.height,size:blob.size};
 }
 const slug=s=>(s||'gambar').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/\.[a-z0-9]+$/,'').replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'').slice(0,40)||'gambar';
 async function addFiles(files){
@@ -222,8 +214,8 @@ async function addFiles(files){
   try{
    const isBanner=dropTarget==='banner';
    const img=await processImage(f,isBanner?1600:1000,isBanner?1000:1000);
-   const path='uploads/'+(isBanner?'banner':'produk')+'-'+Date.now().toString(36)+'-'+slug(f.name)+'.'+img.ext;
-   pending[path]=img;
+   const path='pending:'+Date.now().toString(36)+Math.random().toString(36).slice(2,6);
+   img.name=(isBanner?'banner-':'produk-')+slug(f.name);pending[path]=img;
    if(dropTarget==='banner')data.banners.unshift({image:path,alt:'',link:'?pesan=1',active:true});
    else if(dropTarget==='replace'&&data.products[replaceIdx])data.products[replaceIdx].image=path;
    else data.products.unshift({image:path,name:'',price:'',category:'',product:'Banner Ulang Tahun',badge:'BARU',shopee:'',active:true});
@@ -236,26 +228,23 @@ async function addFiles(files){
 async function save(){
  const missing=data.products.findIndex(p=>!p.name);
  if(missing>-1){status('Isi nama produk dulu (produk ke-'+(missing+1)+').','bad');switchTab('products');document.querySelectorAll('#product-list [data-k=name]')[missing]?.focus();return;}
- $('#btn-save').disabled=true;status('Menyimpan ke GitHub…');
+ $('#btn-save').disabled=true;
  try{
-  const ref=await api('/git/ref/heads/'+BRANCH);const base=ref.object.sha;
-  const commit=await api('/git/commits/'+base);
   const used=new Set([...data.banners.map(b=>b.image),...data.products.map(p=>p.image)]);
-  const tree=[];
-  for(const [path,img] of Object.entries(pending)){
-   if(!used.has(path))continue;
-   status('Mengunggah '+path.split('/').pop()+'…');
-   const blob=await api('/git/blobs',{method:'POST',body:JSON.stringify({content:img.b64,encoding:'base64'})});
-   tree.push({path:'public/'+path,mode:'100644',type:'blob',sha:blob.sha});
+  const map={};let n=0;const total=Object.keys(pending).filter(k=>used.has(k)).length;
+  for(const [key,img] of Object.entries(pending)){
+   if(!used.has(key))continue;
+   status('Mengunggah gambar '+(++n)+' dari '+total+'…');
+   const r=await api('upload',{name:img.name,type:img.type,data:img.b64});
+   map[key]=r.url;previews[r.url]=img.url;
   }
-  const clean={showDefaultBanners:data.showDefaultBanners,banners:data.banners.map(({image,alt,link,active})=>({image,alt:alt||'',link:link||'',active:active!==false})),products:data.products.map(({image,name,price,category,product,badge,shopee,active})=>({image,name,price:price||'',category:category||'',product:product||'Banner Ulang Tahun',badge:badge||'',shopee:shopee||'',active:active!==false}))};
-  tree.push({path:CONTENT,mode:'100644',type:'blob',content:JSON.stringify(clean,null,2)+'\n'});
-  const t=await api('/git/trees',{method:'POST',body:JSON.stringify({base_tree:commit.tree.sha,tree})});
-  const c=await api('/git/commits',{method:'POST',body:JSON.stringify({message:'Dashboard: perbarui banner & produk',tree:t.sha,parents:[base]})});
-  await api('/git/refs/heads/'+BRANCH,{method:'PATCH',body:JSON.stringify({sha:c.sha})});
-  for(const [k,v] of Object.entries(pending))previews[k]=v.url;
-  pending={};dirty=false;render();
-  status('Tersimpan ✓ Situs akan berubah dalam ±1 menit.','ok');
+  data.banners.forEach(b=>{if(map[b.image])b.image=map[b.image];});
+  data.products.forEach(p=>{if(map[p.image])p.image=map[p.image];});
+  pending={};
+  status('Menyimpan…');
+  const j=await api('save',{content:data});
+  data=j.content;dirty=false;render();
+  status('Tersimpan ✓ Perubahan tampil di situs dalam ±15 detik.','ok');
  }catch(e){status('Gagal menyimpan: '+e.message,'bad');$('#btn-save').disabled=false;}
 }
 
@@ -273,20 +262,23 @@ $('#btn-save').addEventListener('click',save);
 $('#btn-reload').addEventListener('click',()=>{if(dirty&&!confirm('Buang perubahan yang belum disimpan?'))return;load().catch(e=>status(e.message,'bad'));});
 window.addEventListener('beforeunload',e=>{if(dirty){e.preventDefault();e.returnValue='';}});
 
-async function login(){
- token=$('#token').value.trim();if(!token){$('#login-msg').textContent='Tempel token dulu.';return;}
- $('#btn-login').disabled=true;$('#login-msg').textContent='Memeriksa…';
- try{
-  await load();
-  try{if($('#remember').checked)localStorage.setItem('vxToken',token);else localStorage.removeItem('vxToken');}catch(e){}
-  $('#login').classList.add('hidden');$('#app').classList.remove('hidden');$('#savebar').classList.remove('hidden');
- }catch(e){$('#login-msg').textContent=e.message;$('#login-msg').style.color='var(--bad)';}
+function showLogin(msg){$('#app').classList.add('hidden');$('#savebar').classList.add('hidden');$('#login').classList.remove('hidden');if(msg){$('#login-msg').textContent=msg;$('#login-msg').style.color='var(--bad)';}}
+async function enter(){await load();$('#login').classList.add('hidden');$('#app').classList.remove('hidden');$('#savebar').classList.remove('hidden');}
+$('#login-form').addEventListener('submit',async e=>{
+ e.preventDefault();$('#btn-login').disabled=true;$('#login-msg').style.color='';$('#login-msg').textContent='Memeriksa…';
+ try{await api('login',{username:$('#username').value.trim(),password:$('#password').value});$('#password').value='';$('#login-msg').textContent='';await enter();}
+ catch(err){$('#login-msg').textContent=err.message;$('#login-msg').style.color='var(--bad)';}
  $('#btn-login').disabled=false;
-}
-$('#btn-login').addEventListener('click',login);
-$('#token').addEventListener('keydown',e=>{if(e.key==='Enter')login();});
-$('#btn-logout').addEventListener('click',()=>{if(dirty&&!confirm('Ada perubahan belum disimpan. Tetap keluar?'))return;try{localStorage.removeItem('vxToken')}catch(e){}location.reload();});
-try{const t=localStorage.getItem('vxToken');if(t){$('#token').value=t;login();}}catch(e){}
+});
+$('#btn-logout').addEventListener('click',async()=>{if(dirty&&!confirm('Ada perubahan belum disimpan. Tetap keluar?'))return;dirty=false;try{await api('logout');}catch(e){}location.reload();});
+(async()=>{
+ try{
+  const st=await api('status');
+  const miss=[];if(!st.configured.login)miss.push('<b>ADMIN_USERNAME</b> dan <b>ADMIN_PASSWORD</b> belum diisi di Vercel → Project → Settings → Environment Variables.');if(!st.configured.storage)miss.push('Penyimpanan <b>Vercel Blob</b> belum dihubungkan (Vercel → Storage → Create → Blob → Connect ke project ini).');
+  if(miss.length){$('#setup-help').innerHTML='<b>Dashboard belum siap:</b><ul style="margin:6px 0 0;padding-left:18px">'+miss.map(m=>'<li>'+m+'</li>').join('')+'</ul>Setelah diatur, lakukan Redeploy di Vercel.';$('#setup-help').classList.remove('hidden');}
+  if(st.authed&&st.configured.storage)await enter();
+ }catch(e){}
+})();
 </script>
 </body>
 </html>
