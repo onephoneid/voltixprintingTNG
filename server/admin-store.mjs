@@ -1,6 +1,6 @@
 // Penyimpanan konten dashboard (Vercel Blob) + sesi login admin.
-import {createHmac, createHash, timingSafeEqual} from 'node:crypto';
-import {put, get} from '@vercel/blob';
+import {createHmac, createHash, timingSafeEqual, scryptSync, randomBytes} from 'node:crypto';
+import {put, get, list} from '@vercel/blob';
 
 export const DEFAULT_CONTENT = {showDefaultBanners: true, banners: [], products: []};
 export const PRODUCTS = ['Banner Ulang Tahun','Banner Usaha','Banner Wisuda','Banner Acara','Stiker','Gantungan Kunci','Baju Custom','Kartu Undangan','Poster Custom','Neon Box','Google Review Card'];
@@ -12,45 +12,90 @@ export const env = () => ({
   pass: process.env.ADMIN_PASSWORD || '',
   blob: process.env.BLOB_READ_WRITE_TOKEN || ''
 });
-export const configured = () => {const e = env(); return {login: !!(e.user && e.pass), storage: !!e.blob};};
-
-const key = () => {const e = env(); return createHash('sha256').update('vx|' + e.user + '|' + e.pass + '|' + e.blob).digest();};
-const sign = v => createHmac('sha256', key()).update(v).digest('base64url');
-const same = (a, b) => {const x = Buffer.from(String(a)), y = Buffer.from(String(b)); return x.length === y.length && timingSafeEqual(x, y);};
-
-export function checkLogin(username, password) {
+// Akun admin: dari Environment Variables (jika diisi) atau dibuat sekali lewat /admin (disimpan ter-hash di Blob).
+let credCache = null, credAt = 0;
+async function storedCred() {
+  if (!env().blob) return null;
+  if (credCache && Date.now() - credAt < 60000) return credCache;
+  try {
+    const {blobs} = await list({prefix: 'admin/cred-', limit: 10});
+    blobs.sort((a, b) => new Date(b.uploadedAt) - new Date(a.uploadedAt));
+    for (const b of blobs) {
+      for (const access of ['public', 'private']) {
+        try {
+          const r = await get(b.url, {access, useCache: false});
+          if (r) { const j = JSON.parse(await new Response(r.stream).text()); if (j && j.u && j.salt && j.hash) { credCache = j; credAt = Date.now(); return j; } }
+        } catch (e) {}
+      }
+    }
+  } catch (e) {}
+  credCache = null; credAt = Date.now();
+  return null;
+}
+const hashPw = (pw, salt) => scryptSync(String(pw), Buffer.from(salt, 'base64'), 32).toString('base64');
+export async function configured() {
   const e = env();
-  if (!e.user || !e.pass) return false;
-  const u = createHash('sha256').update(String(username || '')).digest();
-  const p = createHash('sha256').update(String(password || '')).digest();
-  const okU = timingSafeEqual(u, createHash('sha256').update(e.user).digest());
-  const okP = timingSafeEqual(p, createHash('sha256').update(e.pass).digest());
+  const envLogin = !!(e.user && e.pass);
+  const cred = envLogin ? null : await storedCred();
+  return {login: envLogin || !!cred, storage: !!e.blob, canSetup: !envLogin && !cred && !!e.blob};
+}
+export async function createAdmin(username, password) {
+  const c = await configured();
+  if (!c.canSetup) throw new Error('Akun admin sudah ada.');
+  username = String(username || '').trim();
+  if (!/^[\w.\-]{3,40}$/.test(username)) throw new Error('Username 3–40 karakter (huruf, angka, titik, strip).');
+  if (String(password || '').length < 8) throw new Error('Password minimal 8 karakter.');
+  const salt = randomBytes(16).toString('base64');
+  const rec = {u: username, salt, hash: hashPw(password, salt), at: new Date().toISOString()};
+  await putAny('admin/cred-' + Date.now().toString(36) + '-' + randomBytes(12).toString('hex') + '.json', JSON.stringify(rec), 'application/json', false, true);
+  credCache = rec; credAt = Date.now();
+}
+async function secret() {
+  const e = env();
+  const cred = (e.user && e.pass) ? null : await storedCred();
+  return createHash('sha256').update('vx|' + e.user + '|' + e.pass + '|' + e.blob + '|' + (cred ? cred.hash : '')).digest();
+}
+const signWith = (k, v) => createHmac('sha256', k).update(v).digest('base64url');
+const same = (a, b) => {const x = Buffer.from(String(a)), y = Buffer.from(String(b)); return x.length === y.length && timingSafeEqual(x, y);};
+const h = v => createHash('sha256').update(String(v || '')).digest();
+
+export async function checkLogin(username, password) {
+  const e = env();
+  if (e.user && e.pass) return timingSafeEqual(h(username), h(e.user)) & timingSafeEqual(h(password), h(e.pass)) ? true : false;
+  const cred = await storedCred();
+  if (!cred) return false;
+  const okU = timingSafeEqual(h(username), h(cred.u));
+  const okP = same(hashPw(password, cred.salt), cred.hash);
   return okU && okP;
 }
-export function sessionCookie() {
+export async function sessionCookie() {
   const exp = String(Math.floor(Date.now() / 1000) + MAX_AGE);
-  return `${COOKIE}=${exp}.${sign(exp)}; Path=/; HttpOnly; Secure; SameSite=Strict; Max-Age=${MAX_AGE}`;
+  return `${COOKIE}=${exp}.${signWith(await secret(), exp)}; Path=/; HttpOnly; Secure; SameSite=Strict; Max-Age=${MAX_AGE}`;
 }
 export const clearCookie = () => `${COOKIE}=; Path=/; HttpOnly; Secure; SameSite=Strict; Max-Age=0`;
-export function isAuthed(request) {
-  if (!configured().login) return false;
+export async function isAuthed(request) {
+  if (!(await configured()).login) return false;
   const raw = (request.headers.get('cookie') || '').split(/;\s*/).find(c => c.startsWith(COOKIE + '='));
   if (!raw) return false;
   const [exp, sig] = raw.slice(COOKIE.length + 1).split('.');
   if (!exp || !sig || !/^\d+$/.test(exp) || Number(exp) < Date.now() / 1000) return false;
-  return same(sig, sign(exp));
+  return same(sig, signWith(await secret(), exp));
 }
 
 // ---------- Blob ----------
 let mode = null; // 'public' | 'private'
-async function putAny(pathname, body, contentType, overwrite) {
+async function putAny(pathname, body, contentType, overwrite, preferPrivate) {
   const opts = {contentType, addRandomSuffix: false, allowOverwrite: !!overwrite, cacheControlMaxAge: overwrite ? 60 : 31536000};
-  if (mode !== 'private') {
-    try { const r = await put(pathname, body, {...opts, access: 'public'}); mode = 'public'; return {url: r.url, access: 'public'}; }
-    catch (e) { if (!/private|public|access/i.test(String(e && e.message))) throw e; mode = 'private'; }
+  const order = preferPrivate ? ['private', 'public'] : (mode === 'private' ? ['private'] : ['public', 'private']);
+  let lastErr;
+  for (const access of order) {
+    try {
+      const r = await put(pathname, body, {...opts, access});
+      if (!preferPrivate) mode = access;
+      return {url: access === 'public' ? r.url : '/api/media?p=' + encodeURIComponent(pathname), access};
+    } catch (e) { lastErr = e; if (!/private|public|access/i.test(String(e && e.message))) throw e; }
   }
-  await put(pathname, body, {...opts, access: 'private'});
-  return {url: '/api/media?p=' + encodeURIComponent(pathname), access: 'private'};
+  throw lastErr;
 }
 export async function readContent() {
   if (!configured().storage) return DEFAULT_CONTENT;

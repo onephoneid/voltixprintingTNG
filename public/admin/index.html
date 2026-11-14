@@ -90,6 +90,16 @@ input:focus,select:focus{outline:none;border-color:var(--navy);box-shadow:0 0 0 
  </form>
  <div class="help hidden" id="setup-help" style="margin-top:18px"></div>
 </section>
+<section class="card hidden" id="setup" style="max-width:460px;margin:40px auto">
+ <h2>Buat akun admin</h2>
+ <p class="sub">Sekali saja. Username dan password ini dipakai untuk masuk dashboard berikutnya. Password disimpan dalam bentuk acak (hash), bukan teks asli.</p>
+ <form id="setup-form">
+ <label>Username<input type="text" id="su-user" autocomplete="username" required minlength="3" maxlength="40"></label>
+ <label>Password (min. 8 karakter)<input type="password" id="su-pass" autocomplete="new-password" required minlength="8"></label>
+ <label>Ulangi password<input type="password" id="su-pass2" autocomplete="new-password" required minlength="8"></label>
+ <div class="row" style="margin-top:14px"><button class="btn y" id="btn-setup" type="submit">Buat akun &amp; masuk</button><span id="setup-msg"></span></div>
+ </form>
+</section>
 
 <div id="app" class="hidden">
  <div class="tabs"><button class="on" data-tab="banners">Banner promo atas</button><button data-tab="products">Foto produk</button><button class="btn ghost sm" id="btn-logout" style="margin-left:auto">Keluar</button></div>
@@ -262,7 +272,7 @@ $('#btn-save').addEventListener('click',save);
 $('#btn-reload').addEventListener('click',()=>{if(dirty&&!confirm('Buang perubahan yang belum disimpan?'))return;load().catch(e=>status(e.message,'bad'));});
 window.addEventListener('beforeunload',e=>{if(dirty){e.preventDefault();e.returnValue='';}});
 
-function showLogin(msg){$('#app').classList.add('hidden');$('#savebar').classList.add('hidden');$('#login').classList.remove('hidden');if(msg){$('#login-msg').textContent=msg;$('#login-msg').style.color='var(--bad)';}}
+function showLogin(msg){$('#app').classList.add('hidden');$('#setup').classList.add('hidden');$('#savebar').classList.add('hidden');$('#login').classList.remove('hidden');if(msg){$('#login-msg').textContent=msg;$('#login-msg').style.color='var(--bad)';}}
 async function enter(){await load();$('#login').classList.add('hidden');$('#app').classList.remove('hidden');$('#savebar').classList.remove('hidden');}
 $('#login-form').addEventListener('submit',async e=>{
  e.preventDefault();$('#btn-login').disabled=true;$('#login-msg').style.color='';$('#login-msg').textContent='Memeriksa…';
@@ -270,12 +280,21 @@ $('#login-form').addEventListener('submit',async e=>{
  catch(err){$('#login-msg').textContent=err.message;$('#login-msg').style.color='var(--bad)';}
  $('#btn-login').disabled=false;
 });
+$('#setup-form').addEventListener('submit',async e=>{
+ e.preventDefault();const m=$('#setup-msg');m.style.color='var(--bad)';
+ if($('#su-pass').value!==$('#su-pass2').value){m.textContent='Password tidak sama.';return;}
+ $('#btn-setup').disabled=true;m.style.color='';m.textContent='Membuat akun…';
+ try{await api('setup',{username:$('#su-user').value.trim(),password:$('#su-pass').value});$('#su-pass').value=$('#su-pass2').value='';$('#setup').classList.add('hidden');await enter();}
+ catch(err){m.textContent=err.message;m.style.color='var(--bad)';}
+ $('#btn-setup').disabled=false;
+});
 $('#btn-logout').addEventListener('click',async()=>{if(dirty&&!confirm('Ada perubahan belum disimpan. Tetap keluar?'))return;dirty=false;try{await api('logout');}catch(e){}location.reload();});
 (async()=>{
  try{
   const st=await api('status');
-  const miss=[];if(!st.configured.login)miss.push('<b>ADMIN_USERNAME</b> dan <b>ADMIN_PASSWORD</b> belum diisi di Vercel → Project → Settings → Environment Variables.');if(!st.configured.storage)miss.push('Penyimpanan <b>Vercel Blob</b> belum dihubungkan (Vercel → Storage → Create → Blob → Connect ke project ini).');
-  if(miss.length){$('#setup-help').innerHTML='<b>Dashboard belum siap:</b><ul style="margin:6px 0 0;padding-left:18px">'+miss.map(m=>'<li>'+m+'</li>').join('')+'</ul>Setelah diatur, lakukan Redeploy di Vercel.';$('#setup-help').classList.remove('hidden');}
+  if(st.configured.canSetup){$('#login').classList.add('hidden');$('#setup').classList.remove('hidden');return;}
+  const miss=[];if(!st.configured.storage)miss.push('Penyimpanan <b>Vercel Blob</b> belum dihubungkan (Vercel → project → Storage → Create → Blob → Connect), lalu Redeploy.');
+  if(miss.length){$('#setup-help').innerHTML='<b>Dashboard belum siap:</b><ul style="margin:6px 0 0;padding-left:18px">'+miss.map(m=>'<li>'+m+'</li>').join('')+'</ul>';$('#setup-help').classList.remove('hidden');}
   if(st.authed&&st.configured.storage)await enter();
  }catch(e){}
 })();
