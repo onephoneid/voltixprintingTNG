@@ -374,3 +374,15 @@ details.vx-cat{border:0;padding:0}
 .vx-wa-btn{border:1.5px solid #fff;color:#fff}
 .vx-shopee-btn:hover{background:#fff4ef}.vx-wa-btn:hover{background:#ffffff22}
 @media(max-width:900px){.vx-price-grid{grid-template-columns:1fr}.vx-plist{grid-template-columns:1fr}.vx-shopee-card{position:static}.vx-price-card{padding:14px}}
+/* ---------- konten dari dashboard ---------- */
+.vx-slide-promo{background:#0e1b3f;display:block}
+.vx-slide-promo>a{display:block;height:100%}
+.vx-promo-bg{position:absolute;inset:-20px;width:calc(100% + 40px);height:calc(100% + 40px);object-fit:cover;filter:blur(22px) brightness(.85);transform:scale(1.05)}
+.vx-promo-img{position:relative;width:100%;height:100%;object-fit:contain;display:block}
+.vx-fav-scroll{grid-auto-flow:column;grid-template-columns:none;grid-auto-columns:calc((100% - 80px)/6);overflow-x:auto;scroll-snap-type:x mandatory;padding-bottom:8px}
+.vx-fav-scroll .vx-fav-card{scroll-snap-align:start}
+.vx-fav-img{position:relative}
+.vx-new{position:absolute;top:10px;left:10px;z-index:1;background:#e5007e;color:#fff;font-size:11px;font-weight:800;letter-spacing:.5px;padding:4px 10px;border-radius:999px}
+.vx-dyn-actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.vx-shopee-mini{font-size:13px;font-weight:700;color:#ee4d2d}
+@media(max-width:1200px){.vx-fav-scroll{grid-auto-columns:minmax(170px,1fr)}}
