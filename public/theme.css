@@ -308,3 +308,20 @@ details.vx-cat{border:0;padding:0}
 .vx-cat summary{white-space:nowrap}
 .testimonial-heading h3{font-size:clamp(20px,2vw,28px);font-weight:600}
 .section-heading h2{max-width:900px}
+.product-art.vx-photo,.product-art.invitation-product,.product-art.poster-product,.product-art.shirt-product,.product-art.review-photo{background:#f3f4f6;padding:0}
+.product-art.vx-photo img,.product .product-art img{width:100%;height:100%;object-fit:cover;display:block;transform:none;box-shadow:none;border:0;max-width:none;position:static}
+.product:hover .product-art img{transform:scale(1.04);transition:transform .4s}
+.vx-slide-photo{background:#0e1b3f}
+.vx-slide-photo>img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.vx-slide-photo::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,#172b60f2 0%,#172b60c7 42%,#172b6000 75%)}
+.vx-slide-photo .vx-slide-inner{z-index:1;padding-bottom:4%}
+.vx-slide-photo .vx-big{color:#fff;text-shadow:none}
+.vx-slide-photo .vx-big em{color:var(--vx-yellow)}
+.vx-slide-photo .vx-sub{color:#dbe4ff;font-size:clamp(11px,1.4vw,20px);max-width:520px}
+.vx-slide-photo .vx-badge{background:var(--vx-yellow);color:var(--vx-navy)}
+.steps article{padding:0 0 26px}
+.steps article>*:not(img){margin-left:24px;margin-right:24px}
+.steps article>span{margin-top:20px}
+.vx-step-img{display:block;width:100%;aspect-ratio:16/10;object-fit:cover;background:#d9dbe0}
+.steps article::after{top:auto;bottom:14px}
+@media(max-width:900px){.vx-slide-photo::after{background:linear-gradient(180deg,#172b60e6,#172b60b3 70%,#172b6080)}}

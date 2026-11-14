@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 800">
+<defs>
+<pattern id="brick" width="80" height="40" patternUnits="userSpaceOnUse"><rect width="80" height="40" fill="#1d1f2b"/><path d="M0 39.5h80M40 0v20M0 20h80M0 20v20M80 20v20" stroke="#14151e" stroke-width="3"/></pattern>
+<filter id="glow" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="9" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+<filter id="soft"><feGaussianBlur stdDeviation="40"/></filter>
+<linearGradient id="box" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#22397a"/><stop offset="1" stop-color="#172b60"/></linearGradient>
+</defs>
+<rect width="800" height="800" fill="url(#brick)"/>
+<ellipse cx="400" cy="400" rx="330" ry="210" fill="#ffc400" opacity=".22" filter="url(#soft)"/>
+<rect x="250" y="80" width="10" height="150" fill="#555"/><rect x="540" y="80" width="10" height="150" fill="#555"/>
+<rect x="110" y="220" width="580" height="360" rx="34" fill="url(#box)" stroke="#0e1b3f" stroke-width="10"/>
+<rect x="130" y="240" width="540" height="320" rx="24" fill="none" stroke="#ffffff22" stroke-width="2"/>
+<g filter="url(#glow)" fill="none" stroke-linecap="round" stroke-linejoin="round">
+<path d="M410 262 352 362h44l-22 70 72-104h-46l30-66z" stroke="#ffd84d" stroke-width="12" fill="#ffc400"/>
+<text x="400" y="505" text-anchor="middle" font-family="Arial Black,Arial,sans-serif" font-weight="900" font-size="94" letter-spacing="6" fill="#fff" stroke="#fff7cc" stroke-width="2">VOLTIX</text>
+<text x="400" y="548" text-anchor="middle" font-family="Arial,sans-serif" font-weight="700" font-size="34" letter-spacing="14" fill="#ffc400" stroke="none">PRINTING</text>
+</g>
+<rect x="110" y="610" width="580" height="16" rx="8" fill="#000" opacity=".25" filter="url(#soft)"/>
+</svg>
