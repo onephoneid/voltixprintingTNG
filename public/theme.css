@@ -325,3 +325,26 @@ details.vx-cat{border:0;padding:0}
 .vx-step-img{display:block;width:100%;aspect-ratio:16/10;object-fit:cover;background:#d9dbe0}
 .steps article::after{top:auto;bottom:14px}
 @media(max-width:900px){.vx-slide-photo::after{background:linear-gradient(180deg,#172b60e6,#172b60b3 70%,#172b6080)}}
+/* ---------- maskot Volti ---------- */
+.vx-volti-wrap{position:relative;justify-self:center;display:flex;flex-direction:column;align-items:center}
+.vx-volti-wrap .vx-mascot{width:min(290px,100%);height:auto;margin-top:-120px;margin-bottom:-6px;animation:none;filter:drop-shadow(0 16px 18px #0000001a)}
+.vx-bubble{position:absolute;top:-96px;left:-130px;background:#fff;border:3px solid #13213f;border-radius:18px;padding:10px 16px;font-size:15px;line-height:1.35;color:#111;box-shadow:4px 4px 0 #13213f;white-space:nowrap;z-index:1;animation:vx-pop 3.2s ease-in-out infinite}
+.vx-bubble::after{content:"";position:absolute;right:-14px;bottom:14px;border:10px solid transparent;border-left-color:#13213f}
+.vx-bubble b{color:#172b60}
+@keyframes vx-pop{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+.vx-hero-volti{width:clamp(90px,13vw,200px);height:auto;margin-bottom:-.6em}
+.vx-chat-head{display:flex;align-items:center;gap:10px;padding-right:18px}
+.vx-chat-head img{width:54px;height:auto;background:#fff6d6;border-radius:50%;padding:4px 6px 0}
+.vx-chat-head small{display:block;font-size:11px;color:#777;margin-top:2px}
+.vx-dialog-volti{width:52px;height:auto;float:left;margin:-6px 12px 0 0}
+@media(max-width:900px){
+ .vx-hero-volti{position:absolute;right:4%;top:6%;width:22vw;margin:0}
+ .vx-volti-wrap .vx-mascot{width:170px;margin:0}
+ .vx-volti-wrap{justify-self:end;margin-top:30px}
+ .vx-bubble{top:-10px;left:-150px;font-size:12px;padding:8px 12px}
+}
+@media(prefers-reduced-motion:reduce){.vx-bubble{animation:none}}
+.vx-hero-wa{font-size:clamp(18px,2.9vw,46px)}
+.vx-slide-side{gap:.7em}
+.vx-hero-volti{width:clamp(90px,10vw,160px);margin-bottom:-.3em}
+@media(max-width:900px){.vx-hero-volti{top:3%;right:3%;width:17vw}.vx-hero-wa{font-size:clamp(18px,5vw,34px)}}

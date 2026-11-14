@@ -1,0 +1,62 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 340" role="img" aria-label="Volti, maskot petir Voltix Printing">
+<title>Volti — maskot Voltix Printing</title>
+<style>
+.ol{stroke:#13213f;stroke-width:7;stroke-linecap:round;stroke-linejoin:round}
+.bob{animation:bob 2.6s ease-in-out infinite;transform-box:view-box;transform-origin:150px 300px}
+.wave{animation:wave 1.6s ease-in-out infinite;transform-box:view-box;transform-origin:100px 150px}
+.thumb{animation:thumb 2.6s ease-in-out infinite;transform-box:view-box;transform-origin:206px 140px}
+.eye{animation:blink 4.2s infinite;transform-box:fill-box;transform-origin:center}
+.spark{animation:spark 1.8s ease-in-out infinite;transform-box:fill-box;transform-origin:center}
+.s2{animation-delay:.6s}.s3{animation-delay:1.2s}
+.shadow{animation:shadow 2.6s ease-in-out infinite;transform-box:fill-box;transform-origin:center}
+.shine{animation:shine 2.6s ease-in-out infinite}
+@keyframes bob{0%,100%{transform:translateY(0) rotate(0)}50%{transform:translateY(-12px) rotate(-2deg)}}
+@keyframes wave{0%,100%{transform:rotate(0)}25%{transform:rotate(-22deg)}75%{transform:rotate(14deg)}}
+@keyframes thumb{0%,100%{transform:rotate(0)}50%{transform:rotate(8deg)}}
+@keyframes blink{0%,44%,50%,100%{transform:scaleY(1)}47%{transform:scaleY(.1)}}
+@keyframes spark{0%,100%{opacity:.2;transform:scale(.6) rotate(0)}50%{opacity:1;transform:scale(1.15) rotate(20deg)}}
+@keyframes shadow{0%,100%{transform:scaleX(1);opacity:.22}50%{transform:scaleX(.82);opacity:.14}}
+@keyframes shine{0%,100%{opacity:.55}50%{opacity:.95}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important}}
+</style>
+<ellipse class="shadow" cx="146" cy="326" rx="70" ry="9" fill="#13213f"/>
+<g fill="#ffc400">
+<path class="spark" d="M38 60l8 18 18 8-18 8-8 18-8-18-18-8 18-8z"/>
+<path class="spark s2" d="M262 52l6 13 13 6-13 6-6 13-6-13-13-6 13-6z"/>
+<path class="spark s3" d="M268 236l5 11 11 5-11 5-5 11-5-11-11-5 11-5z" fill="#2f6bff"/>
+</g>
+<g class="bob">
+ <!-- kaki -->
+ <path class="ol" d="M132 248l-12 58M148 244l14 62" fill="none"/>
+ <path class="ol" d="M92 316c0-14 12-20 30-18l10 3v15H96c-3 0-4-0-4 0z" fill="#e8434a"/>
+ <path class="ol" d="M152 301l12-3c18-2 30 4 30 18H152z" fill="#e8434a"/>
+ <path d="M98 316h32M154 316h38" stroke="#fff" stroke-width="4" stroke-linecap="round"/>
+ <!-- tangan kanan (jempol) -->
+ <g class="thumb">
+  <path class="ol" d="M206 140c18 4 30 14 36 28" fill="none"/>
+  <circle class="ol" cx="246" cy="176" r="15" fill="#fff"/>
+  <path class="ol" d="M246 162v-14" fill="none" stroke-width="9"/>
+ </g>
+ <!-- badan petir -->
+ <path class="ol" d="M150 22h58l-36 92h56L118 290l24-114H84z" fill="#ffc400"/>
+ <path class="shine" d="M160 34h30l-26 66" fill="none" stroke="#fff3b0" stroke-width="9" stroke-linecap="round"/>
+ <path d="M196 124h18l-78 128 14-60" fill="none" stroke="#e0a800" stroke-width="7" stroke-linecap="round" stroke-linejoin="round" opacity=".7"/>
+ <!-- topi -->
+ <path class="ol" d="M138 34c6-26 64-34 80-6l2 8h-84z" fill="#172b60"/>
+ <path class="ol" d="M206 36h30c4 0 6 6 2 8-10 4-22 4-34 2z" fill="#172b60"/>
+ <path d="M168 14l7 14 7-14" fill="none" stroke="#ffc400" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+ <!-- wajah -->
+ <g class="eye"><ellipse class="ol" cx="136" cy="134" rx="14" ry="18" fill="#fff" stroke-width="5"/><circle cx="140" cy="138" r="7.5" fill="#13213f"/><circle cx="143" cy="134" r="2.6" fill="#fff"/></g>
+ <g class="eye"><ellipse class="ol" cx="176" cy="128" rx="14" ry="18" fill="#fff" stroke-width="5"/><circle cx="180" cy="132" r="7.5" fill="#13213f"/><circle cx="183" cy="128" r="2.6" fill="#fff"/></g>
+ <ellipse cx="118" cy="162" rx="9" ry="5.5" fill="#ff8a7a" opacity=".75"/>
+ <ellipse cx="190" cy="154" rx="9" ry="5.5" fill="#ff8a7a" opacity=".75"/>
+ <path class="ol" d="M140 160c10 16 32 14 40-4z" fill="#13213f" stroke-width="5"/>
+ <path d="M149 168c6 4 14 4 20-1" fill="none" stroke="#ff6b6b" stroke-width="5" stroke-linecap="round"/>
+ <!-- tangan kiri (melambai) -->
+ <g class="wave">
+  <path class="ol" d="M100 150c-20-6-34-22-40-42" fill="none"/>
+  <circle class="ol" cx="56" cy="96" r="15" fill="#fff"/>
+  <path d="M48 84l-4-8M56 81v-9M64 84l4-8" stroke="#13213f" stroke-width="4" stroke-linecap="round"/>
+ </g>
+</g>
+</svg>
