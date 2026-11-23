@@ -1,0 +1,48 @@
+/* The model uses one local CSS pixel per centimetre before camera projection. */
+.vs-section{--vs-ink:#182948;--vs-line:#dce1e5;max-width:1400px;margin:auto;padding:clamp(38px,5vw,82px) clamp(16px,4vw,64px);color:var(--vs-ink);scroll-margin-top:16px}
+.vs-head,.vs-layout,.vs-inputs,.vs-setting,.vs-actions,.vs-head .vs-kicker,.vs-figure figcaption{display:flex}
+.vs-head{justify-content:space-between;align-items:end;gap:24px;margin-bottom:23px}
+.vs-head .vs-kicker{align-items:center;gap:9px;margin:0 0 9px;color:#526077;font:700 12px/1.3 ui-monospace,monospace;letter-spacing:.14em}
+.vs-kicker i{width:15px;height:10px;background:repeating-linear-gradient(115deg,#b38800 0 2px,transparent 2px 5px)}
+.vs-section .vs-head h2{font:680 clamp(34px,4vw,62px)/1.01 Inter,system-ui,sans-serif;letter-spacing:-.065em;margin:0;color:var(--vs-ink)}
+.vs-head>p{max-width:330px;font-size:16px;line-height:1.55;margin:0;color:#546174}
+.vs-layout{border:1px solid var(--vs-line);border-radius:20px;overflow:hidden;background:white}
+.vs-figure{flex:1;min-width:0;margin:0;display:flex;flex-direction:column;background:#e4dfd2}
+.vs-view{position:relative;flex:1;min-height:365px;overflow:hidden;isolation:isolate;touch-action:pan-y;cursor:grab;background:linear-gradient(140deg,#e5dcc7,#d3ccba 72%,#cdbb9d)}
+.vs-view:active{cursor:grabbing}
+.vs-view button,.vs-room-name{position:absolute;z-index:2;top:16px;border-radius:24px;padding:7px 12px;font:600 13px/1.2 system-ui;background:#fffffff0;color:#263442;box-shadow:0 2px 12px #292c3312}
+.vs-room-name{left:16px}.vs-view .vs-angle{right:16px;border:1px solid #b8b8aa;cursor:pointer}.vs-angle[aria-pressed=true]{background:#172b60;color:white}
+.vs-figure figcaption{justify-content:space-between;flex-wrap:wrap;gap:4px 12px;padding:13px 18px;background:#f5f4ef;color:#4b534f;font-size:13px;font-weight:550}
+.vs-controls{flex:0 0 clamp(295px,28vw,370px);padding:clamp(22px,2.5vw,38px);border-left:1px solid var(--vs-line);align-self:center}
+.vs-controls h3{margin:0 0 18px;font:680 23px/1.15 system-ui;letter-spacing:-.04em;color:var(--vs-ink)}
+.vs-inputs{gap:10px}.vs-inputs label{flex:1;min-width:0;font-size:14px;font-weight:600}.vs-inputs label>span{margin-top:5px;display:flex;align-items:center;border:1px solid #b9c1cb;border-radius:8px;background:white;padding:0 10px}
+.vs-inputs input{width:100%;min-width:0;border:0;background:transparent;color:var(--vs-ink);font:650 19px/1.2 system-ui;padding:9px 0}.vs-inputs small{font-size:13px;color:#596472}
+.vs-presets,.vs-actions{display:flex;flex-wrap:wrap;gap:6px}.vs-presets{margin:12px 0 20px}.vs-presets button,.vs-upload,.vs-clear{border:1px solid var(--vs-line);border-radius:7px;background:white;color:var(--vs-ink);padding:7px 9px;cursor:pointer;font:550 14px/1.2 system-ui}
+.vs-presets button[aria-pressed=true]{background:#eaf0fa;border-color:#899dbd;color:#173367}
+.vs-setting{align-items:center;justify-content:space-between;gap:8px;padding:15px 0;border-top:1px solid var(--vs-line);font-size:14px;font-weight:600}
+.vs-setting select{accent-color:#172b60;background:#f5f6f8;color:var(--vs-ink);border:1px solid var(--vs-line);border-radius:7px;padding:7px;font:inherit}
+.vs-check{display:flex;flex-direction:row;align-items:center;gap:8px;font:500 14px/1.3 system-ui;cursor:pointer}.vs-check input{accent-color:#172b60;width:16px;height:16px}
+.vs-actions{margin:18px 0 12px}.vs-upload{position:relative;display:inline-flex;flex-direction:row;align-items:center;gap:5px}.vs-upload input{position:absolute;inset:0;width:100%;opacity:0;cursor:pointer}.vs-upload:focus-within,.vs-inputs label>span:focus-within{outline:2px solid #436cb5;outline-offset:2px}
+.vs-clear{border:0;text-decoration:underline}.vs-controls [hidden]{display:none}.vs-error,.vs-file-status{font-size:14px;line-height:1.4;margin:8px 0;color:#873e26;overflow-wrap:anywhere}
+.vs-order{width:100%;border:0;border-radius:9px;padding:13px 12px;background:#172b60;color:white;cursor:pointer;font:650 15px/1.3 system-ui}.vs-order:disabled{opacity:.55;cursor:default}
+.vs-hero-link{display:inline-flex;align-items:center;align-self:center;padding:9px 12px;border-radius:6px;background:#fff;color:#172b60;font-size:14px;font-weight:700}
+.vs-scene,.vs-world,.vs-furniture,.vs-box{transform-style:preserve-3d;position:absolute}
+.vs-scene{width:0;height:0;left:50%;top:46%}.vs-world{width:400px;height:280px;left:-200px;top:-140px;transform-origin:200px 140px 0}
+.vs-world *{box-sizing:border-box}.vs-wall,.vs-side,.vs-floor,.vs-skirting,.vs-art,.vs-face,.vs-rug,.vs-lamp-globe,.vs-lamp-stem,.vs-lamp-base{position:absolute;backface-visibility:hidden}
+.vs-wall{inset:0;background:linear-gradient(100deg,#cfc9b8,#e9e5d9 40%,#f6f0df 80%,#e1d9c6)}
+.vs-wall::after{content:"";position:absolute;inset:0;background:repeating-linear-gradient(114deg,transparent 0 28px,#fff8 30px 44px,transparent 46px 60px);mask-image:linear-gradient(235deg,#0008,transparent 51%);pointer-events:none}
+.vs-side{left:400px;top:0;width:220px;height:280px;transform-origin:left center;transform:rotateY(-90deg);background:linear-gradient(90deg,#bdb5a4,#e3d9c5)}
+.vs-floor{left:-250px;top:280px;width:900px;height:500px;transform-origin:top;transform:rotateX(90deg);background:repeating-linear-gradient(90deg,#a48a6e60 0 1px,transparent 1px 21px),repeating-linear-gradient(5deg,#c09e7977 0 1px,transparent 2px 6px),#d6b997}
+.vs-skirting{top:274px;left:0;width:400px;height:6px;background:linear-gradient(#eee9d9,#d5ccb7);transform:translateZ(.5px)}
+.vs-art{transform:translateZ(1.8px);background:#fcf5e6;box-shadow:1.5px 3px 3px #493b342e}
+.vs-art canvas{width:100%;height:100%;display:block}
+.vs-measure{position:absolute;display:grid;place-items:center;color:#263642;font:650 7px/1 ui-monospace,monospace;white-space:nowrap;text-shadow:0 0 2px #fff}
+.vs-mw{bottom:calc(100% + 4px);left:0;width:100%;height:8px;border-bottom:1px solid #40505a}
+.vs-mh{top:0;left:calc(100% + 4px);height:100%;width:9px;writing-mode:vertical-rl;border-left:1px solid #40505a}
+.vs-world.hide-guides .vs-measure,.vs-world.empty .vs-furniture{display:none}
+.vs-furniture{inset:0;pointer-events:none}.vs-box{width:0;height:0}.vs-face{transform-origin:0 0}.vs-rug{width:262px;height:115px;left:69px;top:279px;transform-origin:top;transform:translateZ(15px) rotateX(90deg);background:repeating-linear-gradient(90deg,#b1a791 0 .8px,#d9d1c1 1px 2px);border:3px double #968976;border-radius:5px}
+.vs-lamp-globe{width:34px;height:33px;left:41px;top:131px;border-radius:50%;background:radial-gradient(circle at 34% 28%,#fffdf1,#f6e7bd 63%,#bbab88);transform:translateZ(37px)}
+.vs-lamp-stem{left:56px;top:157px;width:3px;height:121px;background:linear-gradient(90deg,#594943,#ab956f);transform:translateZ(37px)}
+.vs-lamp-base{left:43px;top:273px;width:30px;height:6px;border-radius:50%;background:#65594d;transform:translateZ(37px)}
+@media(max-width:780px){.vs-head{display:block}.vs-head>p{margin-top:10px;max-width:none}.vs-layout{display:block}.vs-controls{border:0;padding:20px}.vs-view{min-height:0;height:clamp(240px,67vw,370px);flex:none}.vs-figure figcaption{padding:10px 13px}.vs-section{scroll-margin-top:8px}.vs-view button,.vs-room-name{top:10px}.vs-room-name{left:10px}.vs-view .vs-angle{right:10px}}
+@media(prefers-reduced-motion:reduce){html:has(#studio-ukuran){scroll-behavior:auto}}
